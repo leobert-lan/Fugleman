@@ -2,7 +2,10 @@ package osp.leobert.android.fugleman;
 
 import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +30,7 @@ final class FugleActionImpl implements FugleAction {
     private final WeakReference<PLAT> platRef;
 
     private List<List<Tip>> tipsList = new ArrayList<>();
-    private TipView mLighterView;
+    private TipView fullTipView;
     private ViewGroup mRootView;
     private boolean isReleased = false;
     private boolean isAutoNext = true;
@@ -36,13 +39,27 @@ final class FugleActionImpl implements FugleAction {
     private boolean hasDidRootViewGlobalLayout = false;
 
     private int showIndex;
-    private OnTipLifecycleListener mOnLighterListener;
-//    private OnLighterViewClickListener mOutSideLighterClickListener;
+    private OnTipLifecycleListener onTipLifecycleListener;
+    private OnPlatClickedListener onPlatClickedListener;
+
+    private View.OnClickListener onFullTipViewClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (onPlatClickedListener != null) {
+                onPlatClickedListener.onClicked(currentTips, v);
+            }
+
+            if (isAutoNext) {
+                nextTip();
+            }
+        }
+    };
+    private boolean interactive = true;
 
     FugleActionImpl(@NonNull PLAT plat, @NonNull Activity activity) {
         platRef = new WeakReference<>(plat);
 
-        mLighterView = new TipView(activity);
+        fullTipView = new TipView(activity);
         mRootView = (ViewGroup) activity.getWindow().getDecorView();
         isDecorView = true;
 
@@ -53,23 +70,43 @@ final class FugleActionImpl implements FugleAction {
         this.platRef = new WeakReference<>(plat);
 
         mRootView = rootView;
-        mLighterView = new TipView(rootView.getContext());
+        fullTipView = new TipView(rootView.getContext());
         mRootView.addOnLayoutChangeListener(mRootViewLayoutChangeListener);
     }
 
+    @Nullable
     private PLAT getPlat() {
         return platRef.get();
     }
 
-    public void addTips(Tip... tips) {
-        if (isReleased){
-            return;
+    public FugleAction addTips(Tip... tips) {
+        if (isReleased) {
+            return this;
         }
 
         if (tips != null
                 && tips.length > 0) {
             tipsList.add(Arrays.asList(tips));
         }
+        return this;
+    }
+
+    @Override
+    public FugleAction setInteractive(boolean interactive) {
+        this.interactive = interactive;
+        return this;
+    }
+
+    @Override
+    public FugleAction lifecycle(OnTipLifecycleListener onTipLifecycleListener) {
+        this.onTipLifecycleListener = onTipLifecycleListener;
+        return this;
+    }
+
+    @Override
+    public FugleAction setPlatClickedListener(OnPlatClickedListener platClickedListener) {
+        this.onPlatClickedListener = platClickedListener;
+        return this;
     }
 
     @Override
@@ -82,7 +119,33 @@ final class FugleActionImpl implements FugleAction {
 
     @Override
     public void display() {
+        if (isReleased) {
+            return;
+        }
 
+        if (interactive) {
+            fullTipView.setOnClickListener(onFullTipViewClickListener);
+        }
+
+        //To ensure the root view has attached to window
+        if (Utils.isAttachedToWindow(mRootView)) {
+            PLAT plat = getPlat();
+            if (plat != null) {
+                if (plat.inEyesight()) {
+
+                    if (fullTipView.getParent() == null) {
+                        mRootView.addView(fullTipView,
+                                new ViewGroup.LayoutParams(mRootView.getWidth(), mRootView.getHeight()));
+                    }
+                    showIndex = -1;
+                    nextTip();
+                } else {
+                    // TODO: 2019/2/15 add to waiting pool
+                }
+            }
+        } else {
+            mRootView.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+        }
     }
 
     @Override
@@ -92,7 +155,12 @@ final class FugleActionImpl implements FugleAction {
 
     @Override
     public void dismiss() {
+        if (onTipLifecycleListener != null) {
+            onTipLifecycleListener.onDismiss(this);
+        }
 
+        isShowing = false;
+        onRelease();
     }
 
     @Override
@@ -104,31 +172,32 @@ final class FugleActionImpl implements FugleAction {
         return !tipsList.isEmpty();
     }
 
+    private List<Tip> currentTips;
+
     @Override
     public void nextTip() {
         if (isReleased) {
             return;
         }
 
-
         if (!hasNextTip()) {
             dismiss();
         } else {
             isShowing = true;
-            if (mOnLighterListener != null) {
-                mOnLighterListener.onDisplay(showIndex);
+            showIndex++;
+            if (onTipLifecycleListener != null) {
+                onTipLifecycleListener.onDisplay(showIndex);
             }
 
-            showIndex++;
-            List<Tip> tips = tipsList.get(0);
-            for (Tip tip : tips) {
+            currentTips = tipsList.get(0);
+            for (Tip tip : currentTips) {
                 checkTip(tip);
             }
 
-            mLighterView.setInitWidth(mRootView.getWidth() - mRootView.getPaddingLeft() - mRootView.getPaddingRight());
-            mLighterView.setInitHeight(mRootView.getHeight() - mRootView.getPaddingTop() - mRootView.getPaddingBottom());
+            fullTipView.setInitWidth(mRootView.getWidth() - mRootView.getPaddingLeft() - mRootView.getPaddingRight());
+            fullTipView.setInitHeight(mRootView.getHeight() - mRootView.getPaddingTop() - mRootView.getPaddingBottom());
 
-            mLighterView.addTip(tips);
+            fullTipView.addTip(currentTips);
             tipsList.remove(0);
         }
     }
@@ -143,19 +212,19 @@ final class FugleActionImpl implements FugleAction {
         }
 
         if (tip.getTipView() == null) {
-            tip.setTipView(LayoutInflater.from(mLighterView.getContext()).inflate(tip.getTipLayoutId(),
-                    mLighterView, false));
+            tip.setTipView(LayoutInflater.from(fullTipView.getContext()).inflate(tip.getTipLayoutId(),
+                    fullTipView, false));
         }
 
-            Utils.checkNotNull(tip.getAnchorView(), "Please pass a anchor view or an id of it.");
+        Utils.checkNotNull(tip.getAnchorView(), "Please pass a anchor view or an id of it.");
 
-            Utils.checkNotNull(tip.getTipView(), "Please pass a tip view or a layout id of tip view.");
+        Utils.checkNotNull(tip.getTipView(), "Please pass a tip view or a layout id of tip view.");
 
         if (tip.getTipViewMargins() == null) {
             tip.setTipViewMargins(new TipViewMargin()); //use empty offset.
         }
 
-        Utils.calculateHighlightedViewRect(mLighterView, tip);
+        Utils.calculateHighlightedViewRect(fullTipView, tip);
 
     }
 
@@ -188,22 +257,66 @@ final class FugleActionImpl implements FugleAction {
                 return;
             }
 
-            if (mLighterView == null || mLighterView.getParent() == null) {
+            if (fullTipView == null || fullTipView.getParent() == null) {
                 return;
             }
 
             if (!isDecorView) {
-                ViewGroup.LayoutParams layoutParams = mLighterView.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = fullTipView.getLayoutParams();
                 layoutParams.width = Math.abs(right - left);
                 layoutParams.height = Math.abs(bottom - top);
 
-                mLighterView.setInitWidth(layoutParams.width);
-                mLighterView.setInitHeight(layoutParams.height);
-                mLighterView.setLayoutParams(layoutParams);
+                fullTipView.setInitWidth(layoutParams.width);
+                fullTipView.setInitHeight(layoutParams.height);
+                fullTipView.setLayoutParams(layoutParams);
             }
 
-            mLighterView.reLayout();
+            fullTipView.reLayout();
         }
     };
 
+    /**
+     * Release all when all specified highlights are completed.
+     */
+    private void onRelease() {
+        if (isReleased) {
+            return;
+        }
+
+        isReleased = true;
+        if (isDecorView) {
+            mRootView.findViewById(android.R.id.content).removeOnLayoutChangeListener(mRootViewLayoutChangeListener);
+        } else {
+            mRootView.removeOnLayoutChangeListener(mRootViewLayoutChangeListener);
+        }
+
+        mRootView.removeView(fullTipView);
+        fullTipView.removeAllViews();
+
+        tipsList.clear();
+        tipsList = null;
+
+        onPlatClickedListener = null;
+        onTipLifecycleListener = null;
+        mRootView = null;
+        fullTipView = null;
+    }
+
+    @Override
+    public FugleAction setBackgroundColor(@ColorInt int color) {
+        if (isReleased) {
+            return this;
+        }
+        fullTipView.setBackgroundColor(color);
+        return this;
+    }
+
+    @Override
+    public FugleAction setBackgroundColorRes(@ColorRes int colorRes) {
+        if (isReleased) {
+            return this;
+        }
+        fullTipView.setBackgroundColor(fullTipView.getResources().getColor(colorRes));
+        return this;
+    }
 }

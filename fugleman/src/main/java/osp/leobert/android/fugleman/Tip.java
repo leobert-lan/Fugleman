@@ -196,7 +196,7 @@ public class Tip {
             return this;
         }
 
-        public Builder alignRule(int val) {
+        public Builder alignRule(@Align int val) {
             alignRule = val;
             return this;
         }

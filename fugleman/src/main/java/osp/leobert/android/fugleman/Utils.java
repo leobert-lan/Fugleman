@@ -1,8 +1,10 @@
 package osp.leobert.android.fugleman;
 
 import android.graphics.RectF;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * <p><b>Package:</b> osp.leobert.android.fugleman </p>
@@ -78,5 +80,16 @@ final class Utils {
             throw new NullPointerException(message);
         }
         return arg;
+    }
+
+    public static boolean isAttachedToWindow(ViewGroup view) {
+        if (view == null){
+            return false;
+        }
+        if (Build.VERSION.SDK_INT >= 19) {
+            return view.isAttachedToWindow();
+        } else {
+            return view.getWindowToken() != null;
+        }
     }
 }
