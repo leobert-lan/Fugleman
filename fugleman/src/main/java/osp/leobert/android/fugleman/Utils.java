@@ -1,7 +1,12 @@
 package osp.leobert.android.fugleman;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.CheckResult;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,5 +96,21 @@ final class Utils {
         } else {
             return view.getWindowToken() != null;
         }
+    }
+
+    public static boolean equals(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
+    }
+
+    @Nullable
+    @CheckResult
+    public static Activity getActivityContext(/*@NonNull*/ Context context) {
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
     }
 }

@@ -18,4 +18,6 @@ public interface PLAT {
      * @return unique key of the PLAT, used as the key in waiting pool;
      */
     String uniqueKey();
+
+    String dimKey();
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import osp.leobert.android.fugleman.pool.Key;
 import osp.leobert.android.fugleman.shapes.Rect;
 
 /**
@@ -140,7 +141,9 @@ final class FugleActionImpl implements FugleAction {
                     showIndex = -1;
                     nextTip();
                 } else {
-                    // TODO: 2019/2/15 add to waiting pool
+                    Key key = new Key(String.valueOf(plat.uniqueKey()),
+                            String.valueOf(plat.dimKey()));
+                    Fugleman.getPool().add(key, this);
                 }
             }
         } else {
