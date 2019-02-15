@@ -1,4 +1,4 @@
-package osp.leobert.android.flugerman_demo;
+package osp.leobert.android.fugleman_demo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

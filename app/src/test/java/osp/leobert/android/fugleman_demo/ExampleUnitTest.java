@@ -1,4 +1,4 @@
-package osp.leobert.android.flugerman;
+package osp.leobert.android.fugleman_demo;
 
 import org.junit.Test;
 

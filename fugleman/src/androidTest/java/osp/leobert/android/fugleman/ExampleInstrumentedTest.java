@@ -1,4 +1,4 @@
-package osp.leobert.android.flugerman_demo;
+package osp.leobert.android.fugleman;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("osp.leobert.android.flugerman_demo", appContext.getPackageName());
+        assertEquals("osp.leobert.android.fugleman.test", appContext.getPackageName());
     }
 }
