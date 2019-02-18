@@ -19,7 +19,7 @@ public interface FugleAction {
 
     FugleAction setInteractive(boolean interactive);
 
-    FugleAction lifecycle(OnTipLifecycleListener onTipLifecycleListener);
+    FugleAction lifecycle(OnFuglemanLifecycleListener onTipLifecycleListener);
 
     FugleAction setPlatClickedListener(OnPlatClickedListener platClickedListener);
 
@@ -30,6 +30,8 @@ public interface FugleAction {
     boolean isDisplaying();
 
     void dismiss();
+
+    void setAutoNext(boolean autoNext);
 
     boolean hasNextTip();
 

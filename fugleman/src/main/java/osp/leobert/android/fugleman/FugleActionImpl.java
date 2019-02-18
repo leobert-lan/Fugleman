@@ -23,7 +23,7 @@ import osp.leobert.android.fugleman.shapes.Rect;
  * <p><b>Package:</b> osp.leobert.android.fugleman </p>
  * <p><b>Project:</b> Fugleman </p>
  * <p><b>Classname:</b> FugleActionImpl </p>
- * <p><b>Description:</b> TODO </p>
+ * <p><b>Description:</b> impl of {@link FugleAction} </p>
  * Created by leobert on 2019/1/15.
  */
 final class FugleActionImpl implements FugleAction {
@@ -40,7 +40,7 @@ final class FugleActionImpl implements FugleAction {
     private boolean hasDidRootViewGlobalLayout = false;
 
     private int showIndex;
-    private OnTipLifecycleListener onTipLifecycleListener;
+    private OnFuglemanLifecycleListener onTipLifecycleListener;
     private OnPlatClickedListener onPlatClickedListener;
 
     private View.OnClickListener onFullTipViewClickListener = new View.OnClickListener() {
@@ -99,7 +99,7 @@ final class FugleActionImpl implements FugleAction {
     }
 
     @Override
-    public FugleAction lifecycle(OnTipLifecycleListener onTipLifecycleListener) {
+    public FugleAction lifecycle(OnFuglemanLifecycleListener onTipLifecycleListener) {
         this.onTipLifecycleListener = onTipLifecycleListener;
         return this;
     }
@@ -164,6 +164,11 @@ final class FugleActionImpl implements FugleAction {
 
         isShowing = false;
         onRelease();
+    }
+
+    @Override
+    public void setAutoNext(boolean autoNext) {
+        this.isAutoNext = autoNext;
     }
 
     @Override

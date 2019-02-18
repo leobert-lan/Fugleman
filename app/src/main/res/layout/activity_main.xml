@@ -9,6 +9,7 @@
         android:id="@+id/test_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:text="Hello World!" />
 
     <Button

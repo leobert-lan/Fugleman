@@ -14,7 +14,7 @@ import osp.leobert.android.fugleman.Align;
 import osp.leobert.android.fugleman.FugleAction;
 import osp.leobert.android.fugleman.Fugleman;
 import osp.leobert.android.fugleman.OnPlatClickedListener;
-import osp.leobert.android.fugleman.OnTipLifecycleListener;
+import osp.leobert.android.fugleman.OnFuglemanLifecycleListener;
 import osp.leobert.android.fugleman.PLAT;
 import osp.leobert.android.fugleman.Tip;
 import osp.leobert.android.fugleman.TipViewMargin;
@@ -41,11 +41,28 @@ public class MainActivity extends AppCompatActivity implements PLAT {
                             .addTips(Tip.newBuilder()
                                     .anchorViewId(R.id.test_1)
                                     .anchorShape(new RoundRect())
-                                    .shapeXOffset(30)
                                     .alignRule(Align.ToRight)
                                     .tipViewMargins(new TipViewMargin(30, 0, 0, 0))
                                     .tipLayoutId(R.layout.layout_tip1)
-                                    .build());
+                                    .build(),
+                                    Tip.newBuilder()
+                                            .anchorViewId(R.id.test_1)
+                                            .anchorShape(new RoundRect())
+                                            .alignRule(Align.Below)
+                                            .tipLayoutId(R.layout.layout_tip1)
+                                            .build(),
+                                    Tip.newBuilder()
+                                            .anchorViewId(R.id.test_1)
+                                            .anchorShape(new RoundRect())
+                                            .alignRule(Align.ToLeft)
+                                            .tipLayoutId(R.layout.layout_tip1)
+                                            .build(),
+                                    Tip.newBuilder()
+                                            .anchorViewId(R.id.test_1)
+                                            .anchorShape(new RoundRect())
+                                            .alignRule(Align.Above)
+                                            .tipLayoutId(R.layout.layout_tip1)
+                                            .build());
                     if (fugleman1.canDisplay())
                         fugleman1.display();
                     else
@@ -103,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements PLAT {
         if (fugleman2 == null) {
             fugleman2 = Fugleman.with(MainActivity.this, MainActivity.this)
                     .setBackgroundColorRes(android.R.color.transparent)
-                    .lifecycle(new OnTipLifecycleListener() {
+                    .lifecycle(new OnFuglemanLifecycleListener() {
                         @Override
                         public void onDisplay(int index) {
                             Toast.makeText(MainActivity.this, "onDisplay:" + index, Toast.LENGTH_SHORT).show();

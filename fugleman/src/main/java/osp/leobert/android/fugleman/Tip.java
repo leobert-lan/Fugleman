@@ -9,7 +9,7 @@ import android.view.animation.Animation;
  * <p><b>Package:</b> osp.leobert.android.fugleman </p>
  * <p><b>Project:</b> Fugleman </p>
  * <p><b>Classname:</b> Tip </p>
- * <p><b>Description:</b> TODO </p>
+ * <p><b>Description:</b> tip entity </p>
  * Created by leobert on 2019/1/15.
  */
 public class Tip {

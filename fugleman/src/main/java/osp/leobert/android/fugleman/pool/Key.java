@@ -7,13 +7,21 @@ import android.text.TextUtils;
  * <p><b>Package:</b> osp.leobert.android.fugleman.pool </p>
  * <p><b>Project:</b> Fugleman </p>
  * <p><b>Classname:</b> Key </p>
- * <p><b>Description:</b> TODO </p>
+ * <p><b>Description:</b> key used in {@link FugleActionPool FugleActionPool} </p>
  * Created by leobert on 2019/2/15.
  */
 public class Key {
+    /**
+     * the unique key to be compared
+     */
     @NonNull
     private final String uniqueKey;
 
+    /**
+     * one key related to the host. maybe activity, fragment, dialog which has lifecycle.
+     * The key will be used to release all related {@link osp.leobert.android.fugleman.FugleAction FugleAction}
+     * in {@link FugleActionPool FugleActionPool} avoid memory leak when the host going destroy
+     */
     @NonNull
     private final String dimKey;
 

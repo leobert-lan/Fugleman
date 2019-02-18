@@ -15,7 +15,7 @@ import android.view.ViewGroup;
  * <p><b>Package:</b> osp.leobert.android.fugleman </p>
  * <p><b>Project:</b> Fugleman </p>
  * <p><b>Classname:</b> Utils </p>
- * <p><b>Description:</b> TODO </p>
+ * <p><b>Description:</b> Utils </p>
  * Created by leobert on 2019/1/15.
  */
 final class Utils {

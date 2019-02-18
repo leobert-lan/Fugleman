@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import osp.leobert.android.fugleman.FugleAction;
+import osp.leobert.android.fugleman.PLAT;
 
 /**
  * <p><b>Package:</b> osp.leobert.android.fugleman.pool </p>
  * <p><b>Project:</b> Fugleman </p>
  * <p><b>Classname:</b> FugleActionPool </p>
- * <p><b>Description:</b> TODO </p>
+ * <p><b>Description:</b> a pool to restore undisplayed {@link FugleAction FugleAction}
+ * caused by the {@link osp.leobert.android.fugleman.PLAT PLAT} is not in {@link PLAT#inEyesight() eyesight}</p>
  * Created by leobert on 2019/2/15.
  */
 public class FugleActionPool {
