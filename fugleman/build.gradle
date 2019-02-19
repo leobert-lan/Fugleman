@@ -1,18 +1,36 @@
 apply plugin: 'com.android.library'
 
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
+
+def MAVEN_LOCAL_PATH = uri('../../local_repo')
+def MAVEN_JDD_PATH = 'http://10.33.72.7:8081/nexus/content/repositories/jdd_android_maven/'
+def ARTIFACT_ID = 'fugleman'
+def VERSION_NAME = '0.0.1'
+def GROUP_ID = 'osp.leobert.android'
+
+ext {
+    bintrayName = ARTIFACT_ID
+    artifact = ARTIFACT_ID
+    libraryName = ARTIFACT_ID
+    libraryDescription = 'none'
+    libraryVersion = VERSION_NAME
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/leobert-lan/Fugleman/blob/master/LICENSE'
+    allLicenses = ["MIT"]
+}
+
 android {
-    compileSdkVersion 28
-
-
+    compileSdkVersion versions.compileSdk
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -25,10 +43,35 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation deps.support.v7.appcompat//'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+
+apply plugin: 'maven'
+
+apply from: '../installv1.gradle'
+apply from: '../bintrayv1.gradle'
+
+Properties _properties = new Properties()
+_properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+def acc = _properties.getProperty("jdd.ACCOUNT")
+def pwd = _properties.getProperty("jdd.PASSWORD")
+
+uploadArchives() {
+    repositories {
+        mavenDeployer {
+            repository(url: MAVEN_JDD_PATH) {
+                authentication(userName: acc, password: pwd)
+            }
+            pom.project {
+                groupId GROUP_ID
+                artifactId ARTIFACT_ID
+                version VERSION_NAME
+            }
+        }
+    }
 }
